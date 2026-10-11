@@ -2,9 +2,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import z from "zod";
 import { ProductService } from "../services/ProductService";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 const server = new McpServer({
-    name: "ecommerce-products-mcp",
+    name: "ecommerce-custom-mcp",
     version: "1.0.0"
 });
 
@@ -38,7 +39,7 @@ server.registerTool(
     async ({sku, name, description, price, quantity}) => {
         const createdProduct = await productService.addProduct({sku, name, description, price, quantity});
         const structuredProduct = { ...createdProduct };
-        
+
         return {
             content: [
                 {
@@ -50,3 +51,8 @@ server.registerTool(
         };
     }
 );
+
+(async () => {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+})();
